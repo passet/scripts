@@ -1,17 +1,26 @@
 #!/bin/bash 
 # Assemble contigs using velvet and generate summary statistics using 
 # process_contigs.pl
-#
-WORK_DIR=P.cact_assembly
-HASH_LENGTH=$1
-FORWARD_FILE=P.cact_411_1M_F_trim.fastq
-REVERSE_FILE=P.cact_411_1M_R_trim.fastq
-ASSEMBLY_NAME=P.cact
+#$ -S /bin/bash
+#$ -cwd
+#$ -pe smp 4
+#$ -l virtual_free=4G
 
-echo "hash length is $HASH_LENGTH"
+HASH_LENGTH=$1
+FORWARD_FILE=$2
+REVERSE_FILE=$3
+ASSEMBLY_NAME=$4
+WORK_DIR=$TMPDIR
+
+echo "hash length =  $HASH_LENGTH"
+echo "forward file = $FORWARD_FILE"
+echo "reverse file = $REVERSE_FILE"
+echo "assembly name = $ASSEMBLY_NAME"
+
+
 
 velveth $WORK_DIR $HASH_LENGTH -fastq -shortPaired -separate $FORWARD_FILE $REVERSE_FILE
 velvetg $WORK_DIR -long_mult_cutoff 1 -exp_cov 6 -ins_length 700 -cov_cutoff 2 -min_contig_lgth 750
 process_contigs.pl -i $WORK_DIR/contigs.fa -o $ASSEMLY_NAME.$HASH_LENGTH
 
-rm -R $WORK_DIR
+
